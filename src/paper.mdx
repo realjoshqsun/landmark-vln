@@ -1,0 +1,147 @@
+---
+title: "LandMarkVLN · Do Navigation VLA Models Ground What They Are Told?"
+theme: light
+favicon: favicon.svg
+description: "LandMarkVLN is a 7,228-sample evaluation dataset for auditing whether navigation VLA models localize and rely on instructed landmarks. WACV 2027."
+thumbnail: social-preview.png
+---
+
+import Header from "./components/Header.astro";
+import HighlightedSection from "./components/HighlightedSection.astro";
+import Figure from "./components/Figure.astro";
+import Picture from "./components/Picture.astro";
+import Wide from "./components/Wide.astro";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/starwind/tabs";
+import { Comparison } from "./components/Comparison.tsx";
+import aligned from "./assets/paper/focus-aligned.png";
+import misaligned from "./assets/paper/focus-misaligned.png";
+import vxa from "./assets/paper/figure-2-vxa.png";
+import intervention from "./assets/paper/figure-3-intervention.png";
+import modelComparison from "./assets/paper/figure-4-model-comparison.png";
+
+<Header
+  projectName="LandMarkVLN"
+  title="Do Navigation VLA Models Ground What They Are Told?"
+  subtitle="An Empirical Audit of Landmark-Vision Alignment in VLN"
+  conference="WACV 2027 · Datasets Track"
+  authors={[
+    { name: "Josh Qixuan Sun", url: "https://realjoshqsun.github.io/" },
+    { name: "Xiaoying Xing" },
+    { name: "Yurun Chen" },
+    { name: "Huaiyuan Weng" },
+    { name: "Wentao Zhu" },
+    { name: "Mark Crowley", url: "https://markcrowley.ca/" },
+  ]}
+  links={[
+    { name: "Explore the audit", url: "#audit", icon: "ri:compass-3-line" },
+    { name: "BibTeX", url: "#citation", icon: "ri:double-quotes-l" },
+  ]}
+/>
+
+<div class="project-stats not-prose" aria-label="Dataset and evaluation scale">
+  <div><strong>7,228</strong><span>evaluation samples</span></div>
+  <div><strong>8</strong><span>navigation VLA models</span></div>
+  <div><strong>2</strong><span>complementary audit views</span></div>
+</div>
+
+<section class="motivating-case" aria-labelledby="motivation-title">
+  <p class="section-eyebrow">The question behind the benchmark</p>
+  <h2 id="motivation-title">Correct actions do not establish landmark grounding.</h2>
+  <p class="case-intro">Two predictions can agree with the reference action while their visual attribution tells different stories.</p>
+  <div class="instruction not-prose"><span>Instruction</span><q>Turn slight left and move towards the <strong>black chair</strong>.</q></div>
+  <div class="comparison-labels not-prose"><span>Landmark-localized attribution</span><span>Attribution misses the landmark</span></div>
+  <div class="focus-comparison">
+    <Comparison client:load>
+      <Picture slot="itemOne" src={aligned} alt="Attribution focuses on the instructed black chair, with an acceptable local action." priority />
+      <Picture slot="itemTwo" src={misaligned} alt="Attribution misses the instructed black chair, despite an acceptable local action." priority />
+    </Comparison>
+  </div>
+  <p class="figure-note">Drag to compare the two attribution views from the paper’s motivating example. Both actions are correct; only one attribution map localizes the named landmark.</p>
+</section>
+
+<HighlightedSection>
+
+## Overview
+
+Vision-and-language navigation requires an agent to connect route instructions with what it sees. Standard navigation metrics measure how well it moves, but do not reveal which visual evidence supports its actions.
+
+**LandMarkVLN** connects each instructed landmark to current and historical observations, masks of the same physical object, and local reference actions. We use it to audit eight released navigation VLA models from two complementary perspectives: **where visual attribution falls**, and **whether editing the landmark changes the output more than a matched control**.
+
+The central finding: acceptable local actions and broad visual responsiveness are not, by themselves, reliable evidence that a model relies on the instructed landmark.
+
+</HighlightedSection>
+
+<h2 id="audit">Two views of landmark–vision alignment</h2>
+
+Localization and output sensitivity answer different questions. The audit reports both, alongside local action agreement.
+
+<Wide>
+  <div class="audit-panel">
+    <Tabs defaultValue="attribution">
+      <TabsList aria-label="Audit method">
+        <TabsTrigger value="attribution">01 · Visual attribution</TabsTrigger>
+        <TabsTrigger value="intervention">02 · Matched intervention</TabsTrigger>
+      </TabsList>
+      <TabsContent value="attribution">
+        <div class="audit-description"><h3>Does the attribution localize the instructed landmark?</h3><p>Compare the visual attribution map with the landmark mask, then test whether localization is more frequent when the local action is acceptable.</p></div>
+        <Picture src={vxa} alt="The paper’s vision-action audit, linking visual attribution and landmark localization to local action agreement." />
+      </TabsContent>
+      <TabsContent value="intervention">
+        <div class="audit-description"><h3>Is the output specifically sensitive to the landmark?</h3><p>Apply the same edit to the landmark and to a same-shaped non-landmark region. Compare the output changes from the clean prediction. A full-frame edit separately measures general visual responsiveness.</p></div>
+        <Picture src={intervention} alt="The paper’s matched intervention procedure, comparing landmark, matched-control, and full-frame visual edits." />
+      </TabsContent>
+    </Tabs>
+  </div>
+</Wide>
+
+<h2 id="dataset">One landmark, linked through time</h2>
+
+Each sample joins a navigation instruction and a singular landmark phrase with a current RGB observation, recent observation history, temporally aligned masks of the **same physical landmark**, and a local expert-action horizon. The dataset is constructed from the continuous-environment releases of R2R and RxR, using English instructions.
+
+<div class="dataset-fields not-prose" aria-label="Contents of a LandMarkVLN sample">
+  <span>Instruction + landmark</span><span>Current + historical views</span><span>Same-instance masks</span><span>Local reference actions</span>
+</div>
+
+### Three stages of construction
+
+| Stage | What is checked | Output |
+| :--- | :--- | :--- |
+| Text-only selection | The phrase denotes one resolvable physical object instance. | 118,706 candidate identities |
+| Current-view grounding | The target is visible, unique, and geometrically usable. | 19,742 current-grounded identities |
+| Temporal verification | Visibility and same-instance identity are checked across history. | **7,228 intervention-ready samples** |
+
+The current-view stage evaluates 350,660 candidate–frame pairs generated from the text-selected identities. Counts across stages use different units.
+
+<h2 id="findings">What the audit finds</h2>
+
+The evaluation covers **OneVLA, InternVLA-N1, OmniVLA, Uni-NaVid, FantasyVLN, StreamVLN, VAMOS, and TIC-VLA**, spanning current-only and history-aware inputs, and discrete and continuous actions.
+
+<div class="finding-list not-prose">
+  <article><div class="finding-count">2 <span>/ 60</span></div><div><h3>Localization rarely tracks acceptable actions.</h3><p>Two of 60 vision-action evaluations support a positive association between landmark localization and acceptable local actions after model-wise Holm correction.</p></div></article>
+  <article><div class="finding-count">23 <span>/ 23</span></div><div><h3>Models respond to broad visual changes.</h3><p>Every evaluated intervention configuration shows a positive mean response to the full-frame edit.</p></div></article>
+  <article><div class="finding-count">6 <span>/ 23</span></div><div><h3>Landmark-specific sensitivity has limited support.</h3><p>Six configurations support a larger response to landmark edits than to matched non-landmark control edits after Holm correction within each native output family.</p></div></article>
+</div>
+
+These denominators count evaluations and configurations, not individual models. The 60 vision-action evaluations combine 20 model–temporal-scope pairs with three attribution estimators. The intervention analysis uses 23 configurations, including separate output branches for InternVLA-N1.
+
+<h3>A shared scene, different diagnoses</h3>
+
+<Wide>
+  <Figure>
+    <Picture slot="figure" src={modelComparison} alt="Current-scope attention × gradient attribution for eight navigation VLA models on the same black-chair instruction, with local action and landmark-localization diagnostics." />
+    <Fragment slot="caption">The same instruction and observation realize all four combinations of action acceptability and landmark localization across eight models. Heatmaps are normalized independently within each model. <a href={modelComparison.src} target="_blank" rel="noopener">View full-size figure ↗</a></Fragment>
+  </Figure>
+</Wide>
+
+<div class="takeaway"><p><strong>Evaluate the evidence behind the action.</strong> Navigation performance, visual attribution, and matched intervention responses provide complementary information; none should be treated as interchangeable evidence of landmark grounding.</p></div>
+
+<h2 id="citation">Citation</h2>
+
+```bibtex
+@inproceedings{sun2027landmark,
+  title = {Do Navigation VLA Models Ground What They Are Told? An Empirical Audit of Landmark-Vision Alignment in VLN},
+  author = {Josh Qixuan Sun and Xiaoying Xing and Yurun Chen and Huaiyuan Weng and Wentao Zhu and Mark Crowley},
+  booktitle = {Winter Conference on Applications of Computer Vision},
+  year = {2027}
+}
+```

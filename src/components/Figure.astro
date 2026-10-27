@@ -1,0 +1,20 @@
+---
+
+---
+
+<figure>
+  <div class="figure-visual w-full **:my-0">
+    <slot name="figure" />
+  </div>
+  <figcaption class="text-center">
+    <slot name="caption" />
+  </figcaption>
+</figure>
+
+<style>
+  .figure-visual :global(picture) {
+    display: block;
+    width: 100%;
+    margin-inline: auto;
+  }
+</style>
