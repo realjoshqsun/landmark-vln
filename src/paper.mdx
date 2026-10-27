@@ -33,6 +33,7 @@ import modelComparison from "./assets/paper/figure-4-model-comparison.png";
     { name: "Mark Crowley", url: "https://markcrowley.ca/" },
   ]}
   links={[
+    { name: "Code", url: "https://github.com/realjoshqsun/LandMarkVLN", icon: "ri:github-line" },
     { name: "Explore the audit", url: "#audit", icon: "ri:compass-3-line" },
     { name: "BibTeX", url: "#citation", icon: "ri:double-quotes-l" },
   ]}
@@ -134,6 +135,12 @@ These denominators count evaluations and configurations, not individual models. 
 </Wide>
 
 <div class="takeaway"><p><strong>Evaluate the evidence behind the action.</strong> Navigation performance, visual attribution, and matched intervention responses provide complementary information; none should be treated as interchangeable evidence of landmark grounding.</p></div>
+
+<h2 id="code">Code and reproducibility</h2>
+
+The [official LandMarkVLN repository](https://github.com/realjoshqsun/LandMarkVLN) provides CPU analysis code and frozen, sample-level measurements for all eight models. It reproduces the 60 vision-action panels, 23 matched intervention analyses, 23 full-frame response summaries, and 23 attribution–intervention correlations.
+
+See the [reproducibility guide](https://github.com/realjoshqsun/LandMarkVLN/blob/main/REPRODUCIBILITY.md) for validation, tests, and analysis commands. The release starts from model measurements; the dataset-construction and GPU inference pipelines, raw images, instruction text, pixel masks, and full attribution maps are not included.
 
 <h2 id="citation">Citation</h2>
 
